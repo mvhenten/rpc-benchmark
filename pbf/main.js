@@ -7,7 +7,20 @@ const Messages = new Map();
 
 const encode = (method, params) => {
     Schema[method].write(params, pbf);
-    return pbf.finish().buffer;
+    const uint8 = pbf.finish();
+    
+    console.log(uint8.byteLength, 'my unit9');
+    
+    var buf = uint8.buffer.slice(0, uint8.byteLength);
+    
+    console.log("buf:", buf);
+    console.log("buf.length", buf.length);
+    
+    
+    
+    console.log(new Uint8Array(buf), "from buffer");
+    
+    return uint8.buffer;
 };
 
 const postMessage = (worker, method, params) => {

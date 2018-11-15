@@ -4,6 +4,9 @@ const Schema = require('./schema.js');
 
 const decode = (message) => {
     const {method, params} = message;
+    
+    console.log(params)
+    console.log(params.size);
     const pbf = new Pbf(params);
     return Schema[method].read(pbf);
 };
