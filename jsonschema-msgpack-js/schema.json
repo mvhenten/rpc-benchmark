@@ -4,7 +4,7 @@
   "title": "Simple message",
   "type": "object",
   "properties": {
-    "message_string": {
+    "messageString": {
       "type": "string",
       "description": "A message string"
     }

@@ -24,7 +24,7 @@ $root.awesomepackage = (function() {
          * Properties of an AwesomeMessage.
          * @memberof awesomepackage
          * @interface IAwesomeMessage
-         * @property {string|null} [awesomeField] AwesomeMessage awesomeField
+         * @property {string} messageString AwesomeMessage messageString
          */
 
         /**
@@ -43,12 +43,12 @@ $root.awesomepackage = (function() {
         }
 
         /**
-         * AwesomeMessage awesomeField.
-         * @member {string} awesomeField
+         * AwesomeMessage messageString.
+         * @member {string} messageString
          * @memberof awesomepackage.AwesomeMessage
          * @instance
          */
-        AwesomeMessage.prototype.awesomeField = "";
+        AwesomeMessage.prototype.messageString = "";
 
         /**
          * Creates a new AwesomeMessage instance using the specified properties.
@@ -74,8 +74,7 @@ $root.awesomepackage = (function() {
         AwesomeMessage.encode = function encode(message, writer) {
             if (!writer)
                 writer = $Writer.create();
-            if (message.awesomeField != null && message.hasOwnProperty("awesomeField"))
-                writer.uint32(/* id 1, wireType 2 =*/10).string(message.awesomeField);
+            writer.uint32(/* id 1, wireType 2 =*/10).string(message.messageString);
             return writer;
         };
 
@@ -111,13 +110,15 @@ $root.awesomepackage = (function() {
                 var tag = reader.uint32();
                 switch (tag >>> 3) {
                 case 1:
-                    message.awesomeField = reader.string();
+                    message.messageString = reader.string();
                     break;
                 default:
                     reader.skipType(tag & 7);
                     break;
                 }
             }
+            if (!message.hasOwnProperty("messageString"))
+                throw $util.ProtocolError("missing required 'messageString'", { instance: message });
             return message;
         };
 
@@ -148,9 +149,8 @@ $root.awesomepackage = (function() {
         AwesomeMessage.verify = function verify(message) {
             if (typeof message !== "object" || message === null)
                 return "object expected";
-            if (message.awesomeField != null && message.hasOwnProperty("awesomeField"))
-                if (!$util.isString(message.awesomeField))
-                    return "awesomeField: string expected";
+            if (!$util.isString(message.messageString))
+                return "messageString: string expected";
             return null;
         };
 
@@ -166,8 +166,8 @@ $root.awesomepackage = (function() {
             if (object instanceof $root.awesomepackage.AwesomeMessage)
                 return object;
             var message = new $root.awesomepackage.AwesomeMessage();
-            if (object.awesomeField != null)
-                message.awesomeField = String(object.awesomeField);
+            if (object.messageString != null)
+                message.messageString = String(object.messageString);
             return message;
         };
 
@@ -185,9 +185,9 @@ $root.awesomepackage = (function() {
                 options = {};
             var object = {};
             if (options.defaults)
-                object.awesomeField = "";
-            if (message.awesomeField != null && message.hasOwnProperty("awesomeField"))
-                object.awesomeField = message.awesomeField;
+                object.messageString = "";
+            if (message.messageString != null && message.hasOwnProperty("messageString"))
+                object.messageString = message.messageString;
             return object;
         };
 
