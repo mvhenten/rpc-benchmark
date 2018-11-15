@@ -4,8 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "watch": "rollup -c -w",
-    "build": "rollup -c",
+    "rwatch": "rollup -c -w",
+    "xbuild": "rollup -c",
+    "watch": "webpack-cli -w --mode production --progress --config=webpack.config.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -19,12 +20,16 @@
     "koa": "^2.6.1",
     "koa-router": "^7.4.0",
     "msgpack-js": "^0.3.0",
+    "msgpack-lite": "^0.1.26",
     "pbf": "^3.1.0",
     "protobufjs": "^6.8.8",
     "rollup": "^0.66.6",
     "rollup-plugin-commonjs": "^9.2.0",
     "rollup-plugin-json": "^3.1.0",
+    "rollup-plugin-node-builtins": "^2.1.2",
     "rollup-plugin-node-resolve": "^3.4.0",
-    "serve": "^10.0.2"
+    "serve": "^10.0.2",
+    "webpack": "^4.25.1",
+    "webpack-cli": "^3.1.2"
   }
 }
