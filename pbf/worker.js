@@ -1,25 +1,16 @@
-const Pbf = require('pbf');
-const Schema = require('./schema.js');
+const Rpc = require("./rpc");
+const rpc = new Rpc();
 
-
-const decode = (message) => {
-    const {method, params} = message;
-    
-    console.log(params)
-    console.log(params.size);
-    const pbf = new Pbf(params);
-    return Schema[method].read(pbf);
-};
-
-onmessage = (evt) => {
-    const params = decode(evt.data);
+onmessage = async (evt) => {
+    const params = rpc.decode(evt.data);
     const {jsonrpc, id} = evt.data;
-
-    console.log("hello params", params);
-
+    
     postMessage({
         jsonrpc,
         method: "ack",
+        params: {
+            words: params.messageString.match(/(\w+)/).length
+        },
         id
     });
 };

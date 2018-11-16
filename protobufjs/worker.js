@@ -5,8 +5,6 @@ onmessage = async (evt) => {
     const params = rpc.decode(evt.data);
     const {jsonrpc, id} = evt.data;
     
-    console.log("got the params", params);
-
     postMessage({
         jsonrpc,
         method: "ack",

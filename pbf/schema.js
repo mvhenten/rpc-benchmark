@@ -5,11 +5,11 @@
 var AwesomeMessage = exports.AwesomeMessage = {};
 
 AwesomeMessage.read = function (pbf, end) {
-    return pbf.readFields(AwesomeMessage._readField, {awesome_field: ""}, end);
+    return pbf.readFields(AwesomeMessage._readField, {messageString: ""}, end);
 };
 AwesomeMessage._readField = function (tag, obj, pbf) {
-    if (tag === 1) obj.awesome_field = pbf.readString();
+    if (tag === 1) obj.messageString = pbf.readString();
 };
 AwesomeMessage.write = function (obj, pbf) {
-    if (obj.awesome_field) pbf.writeStringField(1, obj.awesome_field);
+    if (obj.messageString) pbf.writeStringField(1, obj.messageString);
 };

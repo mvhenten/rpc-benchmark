@@ -11,22 +11,10 @@ class ProtobufJSRPC extends RpcABC {
     
     decode(message) {
         const {method, params} = message;
-        
-        console.log(params, 'got params');
-        console.log(method, 'method');
-
         const handler = Methods[method];
-        
-                console.log(params.byteLength, params.length);
 
-        
-
-        const uint8 = new Uint8Array(params, 0, params.length);
-        
-        console.log(uint8);
-        
         try {
-            const res = handler.decode(uint8);
+            const res = handler.decode(params);
             return res;
         }
         catch (err) {
@@ -38,25 +26,14 @@ class ProtobufJSRPC extends RpcABC {
 
     encode(method, params) {
         const handler = Methods[method];
-        console.log(params);
         const err = handler.verify(params);
 
         if (err) throw new Error(err);
 
-        const uint8 = handler.encode(params).finish();
-        
-        console.log(uint8);
-        
-        const buffer = uint8.buffer.slice(0, uint8.byteLength);
-        // const buffer = uint8.buffer;
-        
-        console.log(uint8.byteLength, uint8.length);
-        console.log(buffer.byteLength, buffer.length);
-        
-        this.decode({ method: "AwesomeMessage", params: buffer});
-        
+        const encoded = handler.encode(params).finish();
+        const uint8 = new Uint8Array(encoded);
 
-        return [buffer, [buffer]];
+        return [uint8, [uint8.buffer]];
     }
 }
 

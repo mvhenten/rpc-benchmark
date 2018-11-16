@@ -1,6 +1,6 @@
 const RpcABC = require("../lib/rpc");
 
-const msgpack = require("msgpack-lite");
+const msgpack = require("msgpack-js");
 const schema = require("./schema.json");
 const Ajv = require('ajv');
 const ajv = new Ajv(); // options can be passed, e.g. {allErrors: true}
@@ -14,10 +14,9 @@ class JSONSchemaRpc extends RpcABC {
 
     decode(message) {
         const { method, params } = message;
-        const uint8 = new Uint8Array(params);
 
         try {
-            const data = msgpack.decode(uint8);
+            const data = msgpack.decode(params);
             const valid = validate(data);
 
             if (!valid)
@@ -38,9 +37,9 @@ class JSONSchemaRpc extends RpcABC {
         if (!valid)
             throw new Error(validate.errors.join(",\n"));
 
-        const data = msgpack.encode(params).buffer;
+        const data = msgpack.encode(params);
 
-        return [data, [data]];
+        return [data, [data.buffer]];
     }
 }
 
