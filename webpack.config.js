@@ -5,6 +5,7 @@ module.exports = {
         "pbf-worker": "./pbf/worker.js",
         "structured-clone-worker": "./structured-clone/worker.js",
         "jsonschema-clone-worker": "./jsonschema-clone/worker.js",
+        "jsonschema-json-stringify": "./jsonschema-json-stringify/worker.js",
         "jsonschema-msgpack-js-worker": "./jsonschema-msgpack-js/worker.js",
         "protobufjs-worker": "./protobufjs/worker.js"
     },

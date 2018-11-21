@@ -4,34 +4,30 @@ const entries = [
         Rpc: require("./structured-clone/rpc")
     },
     {
-        name: "jsonschema & clone",
+        name: "jsonschema & structured clone",
         Rpc: require("./jsonschema-clone/rpc")
     },
-    // {
-    //     name: "jsonschema & clone, no worker validation",
-    //     Rpc: require("./structured-clone/rpc")
-    // },
+    {
+        name: "jsonschema & JSON.stringify",
+        Rpc: require("./jsonschema-json-stringify/rpc")
+    },
     {
         name: "jsonschema & msgpack-js",
         Rpc: require("./jsonschema-msgpack-js/rpc")
-    },
-    // {
-    //     name: "jsonschema & msgpack-js, no worker validation",
-    //     Rpc: require("./jsonschema-msgpack-js/rpc")
-    // },
-    {
-        name: "pbf",
-        Rpc: require("./pbf/rpc")
     },
     {
         name: "protobufjs",
         Rpc: require("./protobufjs/rpc")
     },
     {
+        name: "pbf",
+        Rpc: require("./pbf/rpc")
+    },
+    {
         name: "protobufjs & pbf",
         Rpc: require("./protobufjs/rpc")
     }
-].reverse();
+];
 
 const runBenchmark = async(Rpc, stringData) => {
     return new Promise((resolve) => {
@@ -40,7 +36,7 @@ const runBenchmark = async(Rpc, stringData) => {
         server.finish = () => resolve(server.report());
         server.initialize();
 
-        for (var i = 0; i < 1000; i++) {
+        for (var i = 0; i < 100; i++) {
             server.postMessage("AwesomeMessage", {
                 messageString: stringData
             });
@@ -49,76 +45,86 @@ const runBenchmark = async(Rpc, stringData) => {
     });
 };
 
-const randomdata = (size) => {
-//   return new Array(size).fill(0).map(()=>"x").join(" ");    
-  return new Array(size).fill(0).map(()=>(Math.random()*10e16).toString(36)).join(" ");    
-};
+var data = {};
 
-var nestedObject = (depth=100) => {
-    const obj = {leaves:[]};
-    let cur = obj;
+function fib(n) {
+    const result = [];
+    let a = 0;
+    let b = 1;
 
-    while (0 < depth && (depth = depth -1)) {
-        const key = (Math.random()*10e16).toString(36);
-        const leaf = { [key]: { leaves: [] } };
-        
-        cur.leaves.push(leaf);
-        cur = leaf[key];
+    for (let i = 0; i < n; i++) {
+        let c = a + b;
+        result.push(c);
+        a = b;
+        b = c;
     }
-    return obj;
-};
+    return result;
+}
 
+fib(15).forEach((kb) => {
+    let str = "";
+    const max = kb * 1024;
+    
+    do {
+        str  += (Math.random() * 10e16).toString(36);
+    }
+    while (str.length < max);
+    data[`${kb}kb`] = str.slice(0, max);
+});
 
+function reportToKbps(reports, byteSize) {
+    return reports.map(entry => {
+        let {label, report} = entry;
+        let bits = byteSize * 8;
+        let average = report.average;
+        
+        let kbs = (bits/average).toFixed(2);
+        
+        report.kbs = kbs;
 
-const data = {
-    "JSON blob": JSON.stringify(nestedObject()),
-    "10 words": randomdata(10),
-    "50 words": randomdata(50),
-    "100 words": randomdata(100)
-};
+        return {label, report};
+    });
+    
+}
 
 const run = async() => {
+    const fullreport = [];
+    
 
     for (let key in data) {
-        const reports = [];
+        let reports = [];
+
         for (let entry of entries) {
             let { Rpc, name } = entry;
-    
-            const report = await runBenchmark(Rpc, data[key]);
             
+            let report = await runBenchmark(Rpc, data[key]);
             let label = name;
-            
+
             reports.push({label, report});
         }
-        table(key, reports);
+
+        const bytes = (new TextEncoder('utf-8').encode(data[key])).length;
+        reports = reportToKbps(reports, bytes);
+        report(key, reports);
+
+        fullreport.push({key, reports});
     }
     
     const div = document.createElement("div");
     div.id = "benchmark-complete";
     document.body.append(div);
+    window.drawChart(fullreport);
 };
 
-const table = (header, reports) => {
-    const rows = reports.map(entry => {
-        const {label, report} = entry;
-        return `
-        <tr>
-            <th>${label}</th>
-            <td>${report.average}</td>
-            <td>${report.min}</td>
-            <td>${report.max}</td>
-        </tr>`;
-    });
-    
-    const div = document.createElement("div");
-    div.innerHTML = `<h2>${header}</h2><table class='benchmark-results'>${rows.join("\n")}</table><hr/>`;
-    
-    document.body.appendChild(div);
-    
-    
-    console.log(div.innerText);
-    
+
+const report = (header, reports) => {
+    const results = document.getElementById("benchmark-results");
+    results.innerText += JSON.stringify(reports, null, 2);
 };
+
+const result = document.createElement("pre");
+result.id = "benchmark-results";
+document.body.append(result);
 
 // setTimeout(run, 3000);
 run();

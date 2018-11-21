@@ -1,13 +1,94 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
-    <head>
-        <title> </title>
-        <style>
-            table { text-align: left; border: 1px solid black; }
-            td, th { text-align: left; padding: 5px; border: 1px solid black; }
-        </style>
-    </head>
-    <body>
-        <script src="./dist/benchmark.bundle.js"></script>
-    </body>
+
+<head>
+	<title>Line Chart Multiple Axes</title>
+	<script src="http://www.chartjs.org/dist/2.7.3/Chart.bundle.js"></script>
+	<script src="http://www.chartjs.org/samples/latest/utils.js"></script>
+    <style>
+        table { text-align: left; border: 1px solid black; }
+        td, th { text-align: left; padding: 5px; border: 1px solid black; }
+    </style>
+	<style>
+	canvas {
+		-moz-user-select: none;
+		-webkit-user-select: none;
+		-ms-user-select: none;
+	}
+	</style>
+</head>
+
+<body>
+	<div style="width:100%;">
+		<canvas id="canvas"></canvas>
+	</div>
+	<script>
+	    window.drawChart = function chart(data) {
+            var datasets = new Map();
+            var labels = [];
+            
+            let colors = ["red", "blue", "orange", "yellow", "green", "purple"]
+            
+            data.forEach(entry => {
+                let {key, reports} = entry;
+                
+                labels.push(key);
+                
+                reports.forEach(entry => {
+                    let {label, report} = entry;
+                    let color = colors.pop();
+                    
+                    let dataset = datasets.get(label) || {
+                        label,
+        				borderColor: color,
+        				backgroundColor: color,
+        				fill: false,
+        				data: [],
+        				yAxisID: 'y-axis-1',
+                    };
+                    
+                    dataset.data.push(report.kbs);
+                    datasets.set(label, dataset);
+                });
+            });
+    
+    		var lineChartData = {
+    			labels: labels,
+    			datasets: Array.from(datasets.values())
+    		};
+
+			var ctx = document.getElementById('canvas').getContext('2d');
+				window.myLine = new Chart(ctx, {
+				type: "bar",
+				data: lineChartData,
+				options: {
+					responsive: true,
+					hoverMode: 'index',
+					stacked: false,
+					title: {
+						display: true,
+						text: navigator.userAgent
+					},
+					scales: {
+						yAxes: [{
+							type: 'linear', // only linear but allow scale type registration. This allows extensions to exist solely for log scale for instance
+							display: true,
+							position: 'left',
+							id: 'y-axis-1',
+                            ticks: {
+                                min: 0, // minimum value
+                                max: 60000 // maximum value
+                            }
+						}],
+					}
+				}
+			});
+        }
+    		
+
+
+	</script>
+    <script src="./dist/benchmark.bundle.js"></script>
+</body>
+
 </html>

@@ -18,6 +18,8 @@ const options = yargs
 
 
 const run = async (options) => {
+    ProtractorConfig.capabilities.browserName = options.browser;
+    
     ProtractorLauncher.init(null, ProtractorConfig);
 };
 

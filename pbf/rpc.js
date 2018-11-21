@@ -19,9 +19,7 @@ class PbfRPC extends RpcABC {
         Schema[method].write(params, pbf);
 
         const uint8 = pbf.finish();
-        const buffer = uint8.buffer.slice(0, uint8.byteLength);
-
-        return [buffer, [buffer]];
+        return [uint8, [uint8.buffer]];
     }
 
 }

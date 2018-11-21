@@ -7,45 +7,11 @@ const Browsers = {
     GeckoDriverExecutablePath: __dirname + "/docker/geckodriver.sh",
 };
 
-const table = (rows, rpad=4) => {
-	const colWidth = [];
-    rows = Array.from(rows);
-    
-    
-    for (let r = 0; r < rows.length; r++) {
-    	let row = rows[r];
-
-		for (let c = 0; c < row.length; c++) {
-		    let col = ("| " + row[c] + "").length;
-			colWidth[c] = Math.max(col, colWidth[c] || 0);
-        }
-    }
-    
-    for (let r = 0; r < rows.length; r++) {
-    	let row = rows[r];
-
-		for (let c = 0; c < row.length; c++) {
-        	let col = "| " + row[c] + "";
-            let size = colWidth[c];
-            
-            while (col.length < size + rpad) {
-            	col = col + " ";
-            }
-
-            row[c] = col;
-		}
-    }
-    return rows;
-};
-
-
-
 
 const promsifiy = require("util").promisify;
 const path = require("path");
 const ScreenshotReporter = require("protractor-jasmine2-screenshot-reporter");
 const JasmineReporters = require("jasmine-reporters");
-const {ProtractorBrowserLogReporter} = require("jasmine-protractor-browser-log-reporter");
 const touch = promsifiy(require("touch"));
 const mkdirp = promsifiy(require("mkdirp"));
 const docker = require("./lib/docker");
@@ -85,27 +51,14 @@ exports.ProtractorConfig = {
         await mkdirp(testdir);
         await touch(path.join(testdir, ".apollo-logfile-manager.disabled"));
     },
-    
-    onComplete: () => {
-        browser.manage().logs()
-          .get('browser').then(function(browserLog) {
-              let lines = [];
-              for (let entry of browserLog.slice(1)) {
-                  for (let line of entry.message.split("\\n")) {
-                    line = line.split(/\\t/g)
-                    lines.push(line);
-                  }
-              }
-              
-              console.log(table(lines).map(line => line.join("")).join("\n"));
-        });        
-    },
 
     onPrepare: () => {
         browser.waitForAngularEnabled(false);
         jasmine.getEnv().addReporter(screenshotReporter);
         jasmine.getEnv().addReporter(TerminalReporter);
-        // jasmine.getEnv().addReporter(new ProtractorBrowserLogReporter());
+        var width = 1024;
+        var height = 768;
+        browser.driver.manage().window().setSize(width, height);
     },
     capabilities: {
         browserName: "chrome",
