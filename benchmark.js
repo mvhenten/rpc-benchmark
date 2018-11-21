@@ -93,6 +93,9 @@ const run = async() => {
 
     for (let key in data) {
         let reports = [];
+        
+        console.log("start: ", key);
+        console.time("time: " + key);
 
         for (let entry of entries) {
             let { Rpc, name } = entry;
@@ -105,9 +108,12 @@ const run = async() => {
 
         const bytes = (new TextEncoder('utf-8').encode(data[key])).length;
         reports = reportToKbps(reports, bytes);
-        report(key, reports);
+        console.log({key, reports});
+        // report(key, reports);
+        
 
         fullreport.push({key, reports});
+        console.timeEnd("time: " + key);
     }
     
     const div = document.createElement("div");
